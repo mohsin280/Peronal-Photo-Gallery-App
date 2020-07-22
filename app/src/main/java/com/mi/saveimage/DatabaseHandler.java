@@ -17,7 +17,7 @@ import static android.graphics.BitmapFactory.decodeByteArray;
 public class DatabaseHandler extends SQLiteOpenHelper {
     Context context;
     public static final String DATABASE_NAME = "mydb.db";
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 3;
     private static String createTableQuery="create table imageInfo (imageName TEXT PRIMARY KEY" +
             ",image BLOB)";
     private ByteArrayOutputStream objectByteArrayOutputStream;
@@ -94,4 +94,75 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             return null;
         }
     }
+    public ArrayList<ModelClass> getAllImagesDataInAscending(){
+        try{
+            SQLiteDatabase objSQLiteDatabase = this.getReadableDatabase();
+            ArrayList<ModelClass> objModelClassList = new ArrayList<>();
+            Cursor c = objSQLiteDatabase.rawQuery("select * from imageInfo order by imageName",null);
+            if(c.getCount()!=0)
+            {
+                while(c.moveToNext())
+                {
+                    String imageName=c.getString(0);
+                    byte[] imageBytes = c.getBlob(1);
+                    Bitmap objBitmap = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.length);
+                    objModelClassList.add(new ModelClass(imageName,objBitmap));
+                }
+                return objModelClassList;
+            }
+            else{
+                Toast.makeText(context, "Database is Empty!!", Toast.LENGTH_LONG).show();
+                return null;
+            }
+
+        }
+        catch (Exception e)
+        {
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+            return null;
+        }
+    }
+    public Integer deleteData (String id){
+        try{
+
+            SQLiteDatabase db = this.getWritableDatabase();
+            return db.delete("imageInfo","imageName = ?",new String[]{id});
+        }
+        catch (Exception e)
+        {
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+            return 0;
+        }
+    }
+    public ArrayList<ModelClass> getImage(String imgName)
+    {
+        try{
+            SQLiteDatabase db = this.getReadableDatabase();
+            ArrayList<ModelClass> arrayList = new ArrayList<>();
+            Cursor cursor = (Cursor) db.rawQuery("select * from imageInfo WHERE imageName = ? ",new String[]{imgName});
+            if(cursor.getCount()>0)
+            {
+                while (cursor.moveToNext())
+                {
+                    String imageName=cursor.getString(0);
+                    byte[] imageBytes = cursor.getBlob(1);
+                    Bitmap objBitmap = BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.length);
+                    arrayList.add(new ModelClass(imageName,objBitmap));
+                }
+                Toast.makeText(context,"Image found!!",Toast.LENGTH_LONG).show();
+                cursor.close();
+                return arrayList;
+            }
+            else{
+                Toast.makeText(context, "Wrong Input!!", Toast.LENGTH_LONG).show();
+                cursor.close();
+                return arrayList;
+            }
+        }
+        catch (Exception e){
+            Toast.makeText(context,"Image not found!!",Toast.LENGTH_LONG).show();
+            return null;
+        }
+    }
+
 }

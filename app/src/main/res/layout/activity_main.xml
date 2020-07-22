@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="#95a5a6">
 
     <EditText
         android:id="@+id/et_imgName"
@@ -16,7 +17,7 @@
         android:id="@+id/iv_image"
         android:layout_width="match_parent"
         android:layout_height="300dp"
-        android:src="@drawable/icon_1"
+        android:src="@mipmap/icon_2"
         />
     <Button
         android:id="@+id/btn_saveImg"
